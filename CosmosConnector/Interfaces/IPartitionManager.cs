@@ -10,6 +10,8 @@ namespace CosmosConnector
         void Init();
         Task<IEnumerable<IPartitionInfo>> ListPartitionsAsync();
         IDataSource CreatePartitionSource(IPartitionInfo partitionInfo);
+        IDataTarget CreateTarget(IPartitionInfo partitionInfo);
+
         void Close();
     }
 }

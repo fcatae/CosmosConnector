@@ -16,39 +16,12 @@ namespace CosmosConnector
             IDataSource dataSource = new SimpleSource();
             IDataTarget dataTarget = new ConsoleTarget();
 
-            IPartitionManager sourceFactory = new MultipleSimpleSources(10);
+            IPartitionManager sourceFactory = new MultipleSimple(10);
 
             var taskRunAsync = Process(sourceFactory, dataTarget);
 
             Console.ReadKey();
         }
 
-        static async Task Process(IPartitionManager sourceFactory, IDataTarget dataTarget)
-        {
-            var partitionList = await sourceFactory.ListPartitionsAsync();
-            
-            var taskList = from partition in partitionList
-                           let sourcePartition = sourceFactory.CreatePartitionSource(partition)
-                           let runTask = Process(sourcePartition, dataTarget)
-                           select runTask;
-
-            Task.WaitAll(taskList.ToArray());
-        }
-
-        static async Task Process(IDataSource dataSource, IDataTarget dataTarget)
-        {
-            dataSource.Init();
-            dataTarget.Init();
-
-            while(true)
-            {
-                var messageList = await dataSource.ReadMessagesAsync();
-
-                foreach(var message in messageList)
-                {
-                    await dataTarget.ProcessAsync(message);
-                }
-            }
-        }
     }
 }

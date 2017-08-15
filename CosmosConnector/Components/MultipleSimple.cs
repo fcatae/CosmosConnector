@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace CosmosConnector.Components
 {
-    public class MultipleSimpleSources : IPartitionManager
+    public class MultipleSimple : IPartitionManager
     {
         private int _partitionCount;
 
-        public MultipleSimpleSources(int partitionCount)
+        public MultipleSimple(int partitionCount)
         {
             _partitionCount = partitionCount;
         }
@@ -42,5 +42,9 @@ namespace CosmosConnector.Components
         {            
         }
 
+        public IDataTarget CreateTarget(IPartitionInfo partitionInfo)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
