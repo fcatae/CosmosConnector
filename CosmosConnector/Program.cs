@@ -2,6 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 using CosmosConnector.Components;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CosmosConnector
 {
@@ -14,9 +16,23 @@ namespace CosmosConnector
             IDataSource dataSource = new SimpleSource();
             IDataTarget dataTarget = new ConsoleTarget();
 
-            var taskRunAsync = Process(dataSource, dataTarget);
+            IPartitionManager sourceFactory = new MultipleSimpleSources(10);
+
+            var taskRunAsync = Process(sourceFactory, dataTarget);
 
             Console.ReadKey();
+        }
+
+        static async Task Process(IPartitionManager sourceFactory, IDataTarget dataTarget)
+        {
+            var partitionList = await sourceFactory.ListPartitionsAsync();
+            
+            var taskList = from partition in partitionList
+                           let sourcePartition = sourceFactory.CreatePartitionSource(partition)
+                           let runTask = Process(sourcePartition, dataTarget)
+                           select runTask;
+
+            Task.WaitAll(taskList.ToArray());
         }
 
         static async Task Process(IDataSource dataSource, IDataTarget dataTarget)
