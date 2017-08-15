@@ -13,15 +13,32 @@ namespace CosmosConnector
         {
             Console.WriteLine("Cosmos Connector");
 
-            IDataSource dataSource = new SimpleSource();
+            IDataSource dataSource = new ConsoleSource();
             IDataTarget dataTarget = new ConsoleTarget();
 
-            IPartitionManager sourceFactory = new MultipleSimple(10);
+             IPartitionManager sourceFactory = new MultipleConsoles();
 
-            var taskRunAsync = Process(sourceFactory, dataTarget);
+            //var taskRunAsync = Process(dataSource, dataTarget);
+
+            Connector.Start(sourceFactory, dataTarget).Wait();
 
             Console.ReadKey();
         }
 
+        static async Task Process(IDataSource dataSource, IDataTarget dataTarget)
+        {
+            dataSource.Init();
+            dataTarget.Init();
+
+            while (true)
+            {
+                var messageList = await dataSource.ReadMessagesAsync();
+
+                foreach (var message in messageList)
+                {
+                    await dataTarget.ProcessAsync(message);
+                }
+            }
+        }
     }
 }

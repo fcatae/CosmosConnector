@@ -8,7 +8,7 @@ namespace CosmosConnector
 {
     public class Connector
     {
-        static async Task Start(IPartitionManager sourceFactory, IDataTarget dataTarget)
+        public static async Task Start(IPartitionManager sourceFactory, IDataTarget dataTarget)
         {
             var partitionList = await sourceFactory.ListPartitionsAsync();
 
